@@ -1,0 +1,51 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version "${shadowPluginVersion}"
+}
+
+group = 'com.sammwy'
+version = '1.0-SNAPSHOT'
+description = 'A r/place in Minecraft'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    // Common dependencies
+    compileOnly "io.papermc.paper:paper-api:${paperVersion}"
+    testCompileOnly "io.papermc.paper:paper-api:${paperVersion}"
+
+    // Redis
+    implementation "redis.clients:jedis:${jedisVersion}"
+
+    // MongoDB
+    implementation "org.mongodb:mongodb-driver-sync:${mongodbDriverVersion}"
+
+    testImplementation "junit:junit:${junitVersion}"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.powermock:powermock-module-junit4:${powermockVersion}"
+    testImplementation "org.powermock:powermock-api-mockito2:${powermockVersion}"
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(javaVersion as int))
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+shadowJar {
+    archiveBaseName.set('MPlace')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}
+
+build.dependsOn shadowJar
