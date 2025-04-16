@@ -3,6 +3,7 @@ package com.sammwy.mplace;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,13 +11,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class MPlacePlayerListener implements Listener {
-    private static Random rand = new Random();
+    private static final Random rand = new Random();
 
     public static void init() {
         Bukkit.getPluginManager().registerEvents(new MPlacePlayerListener(), MPlacePlugin.getInstance());
@@ -29,17 +31,27 @@ public class MPlacePlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        String message = event.getMessage();
+
+        String htmlColor = net.md_5.bungee.api.ChatColor.of("#539cff") + "";
+
+        String formattedMessage = htmlColor + player.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE + ChatColor.translateAlternateColorCodes('&', message);
+
+        event.setFormat("%2$s");
+        event.setMessage(formattedMessage);
+    }
+
+    @EventHandler
     public void onVoidFall(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player))
+        if (!(event.getEntity() instanceof Player player))
             return;
         if (event.getCause() != EntityDamageEvent.DamageCause.VOID)
             return;
 
-        Player player = (Player) event.getEntity();
         Location safeLoc = getSafeLocation(player.getWorld());
-        Bukkit.getScheduler().runTaskLater(MPlacePlugin.getInstance(), () -> {
-            player.teleport(safeLoc);
-        }, 1L);
+        Bukkit.getScheduler().runTaskLater(MPlacePlugin.getInstance(), () -> player.teleport(safeLoc), 1L);
         event.setCancelled(true);
     }
 
@@ -55,9 +67,7 @@ public class MPlacePlayerListener implements Listener {
 
         if (dx > MPlaceConfig.CANVAS_RADIUS || dz > MPlaceConfig.CANVAS_RADIUS) {
             Location safeLoc = getSafeLocation(player.getWorld());
-            Bukkit.getScheduler().runTaskLater(MPlacePlugin.getInstance(), () -> {
-                player.teleport(safeLoc);
-            }, 1L);
+            Bukkit.getScheduler().runTaskLater(MPlacePlugin.getInstance(), () -> player.teleport(safeLoc), 1L);
         }
     }
 
