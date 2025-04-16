@@ -23,6 +23,8 @@ public class MPlaceBlockLimiter implements Listener {
             Material.REPEATER, Material.COMPARATOR, Material.OBSERVER, Material.DISPENSER,
             Material.DROPPER, Material.HOPPER, Material.PISTON, Material.STICKY_PISTON,
             Material.TRIPWIRE_HOOK, Material.TRIPWIRE, Material.LEVER,
+            Material.CRAFTER, Material.FURNACE, Material.BREWING_STAND, Material.CAULDRON,
+            Material.DAYLIGHT_DETECTOR,
 
             // Destructive items
             Material.TNT, Material.LAVA_BUCKET, Material.WATER_BUCKET, Material.FIRE_CHARGE,
@@ -48,13 +50,20 @@ public class MPlaceBlockLimiter implements Listener {
 
     public static boolean isBlocked(Material material) {
         String name = material.name().toLowerCase();
-        return BLOCKED_ITEMS.contains(material) || name.contains("spawn") || name.contains("egg");
+        return BLOCKED_ITEMS.contains(material) || name.contains("spawn") || name.contains("egg")
+                || name.contains("bucket") || name.contains("water") || name.contains("boat") || name.contains("chest")
+                || name.contains("chest")
+                || name.contains("sign") || name.contains("redstone");
     }
 
     @EventHandler
     public void onItemUse(PlayerInteractEvent e) {
         Player player = e.getPlayer();
         Material item = player.getInventory().getItemInMainHand().getType();
+
+        if (player.isOp()) {
+            return;
+        }
 
         if (isBlocked(item)) {
             e.setCancelled(true);
@@ -66,6 +75,10 @@ public class MPlaceBlockLimiter implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         Material item = event.getBlock().getType();
+
+        if (player.isOp()) {
+            return;
+        }
 
         if (isBlocked(item)) {
             event.setCancelled(true);
@@ -95,6 +108,10 @@ public class MPlaceBlockLimiter implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Material item = event.getBlock().getType();
+
+        if (player.isOp()) {
+            return;
+        }
 
         if (BLOCKED_ITEMS.contains(item)) {
             event.setCancelled(true);
