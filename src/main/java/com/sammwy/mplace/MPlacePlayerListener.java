@@ -2,8 +2,11 @@ package com.sammwy.mplace;
 
 import java.util.Random;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -35,12 +38,17 @@ public class MPlacePlayerListener implements Listener {
         Player player = event.getPlayer();
         String message = event.getMessage();
 
-        String htmlColor = net.md_5.bungee.api.ChatColor.of("#539cff") + "";
+        Component formattedMessage = Component.text()
+                .append(Component.text(player.getName(), TextColor.fromHexString("#539cff")))
+                .append(Component.text(": ", NamedTextColor.GRAY))
+                .append(Component.text(message, NamedTextColor.WHITE))
+                .build();
 
-        String formattedMessage = htmlColor + player.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE + ChatColor.translateAlternateColorCodes('&', message);
+        event.setCancelled(true);
 
-        event.setFormat("%2$s");
-        event.setMessage(formattedMessage);
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            online.sendMessage(formattedMessage);
+        }
     }
 
     @EventHandler
